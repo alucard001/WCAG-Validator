@@ -1,0 +1,643 @@
+<!DOCTYPE html>
+<html lang='zh-CN'>
+<head>
+    <meta charset='utf-8'>
+    <meta name='viewport' content='width=device-width, initial-scale=1'>
+    <title>WCAG 2.2 验证报告</title>
+    <style>
+        :root {
+            --primary-color: #2c3e50;
+            --secondary-color: #3498db;
+            --success-color: #2ecc71;
+            --warning-color: #f39c12;
+            --danger-color: #e74c3c;
+            --light-color: #f8f9fa;
+            --dark-color: #343a40;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: var(--dark-color);
+            margin: 0;
+            padding: 0;
+            background-color: #f5f5f5;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        header {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-radius: 5px;
+        }
+        h1, h2, h3, h4 {
+            margin-top: 0;
+        }
+        .summary {
+            background-color: white;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        .summary-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }
+        .summary-item {
+            padding: 15px;
+            border-radius: 5px;
+            text-align: center;
+        }
+        .summary-item.total {
+            background-color: var(--primary-color);
+            color: white;
+        }
+        .summary-item.level-a {
+            background-color: var(--danger-color);
+            color: white;
+        }
+        .summary-item.level-aa {
+            background-color: var(--warning-color);
+            color: white;
+        }
+        .summary-item.level-aaa {
+            background-color: var(--secondary-color);
+            color: white;
+        }
+        .summary-item.passed {
+            background-color: var(--success-color);
+            color: white;
+        }
+        .summary-item.failed {
+            background-color: var(--danger-color);
+            color: white;
+        }
+        .issue {
+            background-color: white;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        .issue-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #eee;
+        }
+        .issue-title {
+            margin: 0;
+            font-size: 1.2rem;
+        }
+        .issue-badge {
+            padding: 5px 10px;
+            border-radius: 3px;
+            font-weight: bold;
+            font-size: 0.8rem;
+        }
+        .issue-badge.level-A {
+            background-color: var(--danger-color);
+            color: white;
+        }
+        .issue-badge.level-AA {
+            background-color: var(--warning-color);
+            color: white;
+        }
+        .issue-badge.level-AAA {
+            background-color: var(--secondary-color);
+            color: white;
+        }
+        .issue-description {
+            margin-bottom: 15px;
+        }
+        .issue-location {
+            font-family: monospace;
+            background-color: #f8f9fa;
+            padding: 5px 10px;
+            border-radius: 3px;
+            margin-bottom: 15px;
+        }
+        .code-block {
+            background-color: #f8f9fa;
+            padding: 15px;
+            border-radius: 5px;
+            overflow-x: auto;
+            font-family: monospace;
+            margin-bottom: 15px;
+            white-space: pre-wrap;
+            border-left: 4px solid var(--danger-color);
+        }
+        .fix-suggestions {
+            background-color: #e8f4f8;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 15px;
+            border-left: 4px solid var(--secondary-color);
+        }
+        .fix-suggestions h4 {
+            margin-top: 0;
+            color: var(--secondary-color);
+        }
+        .fix-suggestions ul {
+            margin-bottom: 0;
+        }
+        .code-examples {
+            background-color: #f0f7f0;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 15px;
+            border-left: 4px solid var(--success-color);
+        }
+        .code-examples h4 {
+            margin-top: 0;
+            color: var(--success-color);
+        }
+        .code-example {
+            background-color: white;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 10px;
+            font-family: monospace;
+            white-space: pre-wrap;
+        }
+        .code-example:last-child {
+            margin-bottom: 0;
+        }
+        .code-example-description {
+            font-style: italic;
+            margin-top: 5px;
+            color: #666;
+        }
+        .wcag-reference {
+            margin-top: 15px;
+            font-size: 0.9rem;
+        }
+        .wcag-reference a {
+            color: var(--secondary-color);
+            text-decoration: none;
+        }
+        .wcag-reference a:hover {
+            text-decoration: underline;
+        }
+        footer {
+            text-align: center;
+            margin-top: 30px;
+            padding: 20px;
+            color: #666;
+            font-size: 0.9rem;
+        }
+        @media (max-width: 768px) {
+            .summary-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+        @media (max-width: 480px) {
+            .summary-grid {
+                grid-template-columns: 1fr;
+            }
+            .issue-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            .issue-badge {
+                margin-top: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class='container'>
+        <header>
+            <h1>WCAG 2.2 验证报告</h1>
+            <p>生成时间: 2025-05-21 00:31:16</p>
+            <p>URL: file:///home/ubuntu/wcag_validator/test_sample.html</p>
+        </header>
+
+        <div class='summary'>
+            <h2>摘要</h2>
+            <div class='summary-grid'>
+                <div class='summary-item total'><h3>17</h3><p>总问题数</p></div>
+                <div class='summary-item level-a'><h3>13</h3><p>A级问题</p></div>
+                <div class='summary-item level-aa'><h3>4</h3><p>AA级问题</p></div>
+                <div class='summary-item level-aaa'><h3>0</h3><p>AAA级问题</p></div>
+                <div class='summary-item passed'><h3>3</h3><p>通过规则</p></div>
+                <div class='summary-item failed'><h3>9</h3><p>失败规则</p></div>
+            </div>
+        </div>
+        <h2>问题详情</h2>
+        <div class='issue'>
+            <div class='issue-header'>
+                <h3 class='issue-title'>1. 图像必须有alt属性</h3>
+                <span class='issue-badge level-A'>WCAG 1.1.1 (级别 A)</span>
+            </div>
+            <div class='issue-description'>图像缺少alt属性</div>
+            <div class='issue-location'>行 0, 列 0, 路径 /[document]/html/body/img</div>
+            <div class='code-block'>&lt;img src=&quot;logo.png&quot;/&gt;</div>
+            <div class='fix-suggestions'>
+                <h4>修复建议:</h4>
+                <ul>
+                    <li>添加描述性的alt属性，说明图像内容和目的</li>
+                </ul>
+            </div>
+            <div class='code-examples'>
+                <h4>代码示例:</h4>
+                <div class='code-example'>&lt;img src=&quot;logo.png&quot; alt=&quot;[图像描述]&quot;&gt;</div>
+                <div class='code-example-description'>添加描述性alt属性的示例</div>
+            </div>
+            <div class='wcag-reference'><a href='https://www.w3.org/WAI/WCAG22/Understanding/1-1-1.html' target='_blank'>了解更多关于 WCAG 1.1.1 的信息</a></div>
+        </div>
+        <div class='issue'>
+            <div class='issue-header'>
+                <h3 class='issue-title'>2. 图像必须有alt属性</h3>
+                <span class='issue-badge level-A'>WCAG 1.1.1 (级别 A)</span>
+            </div>
+            <div class='issue-description'>图像的alt属性为空</div>
+            <div class='issue-location'>行 0, 列 0, 路径 /[document]/html/body/img[2]</div>
+            <div class='code-block'>&lt;img alt=&quot;&quot; src=&quot;banner.jpg&quot;/&gt;</div>
+            <div class='fix-suggestions'>
+                <h4>修复建议:</h4>
+                <ul>
+                    <li>如果图像是装饰性的，请添加role=&quot;presentation&quot;属性</li>
+                    <li>如果图像包含信息，请添加描述性的alt属性</li>
+                </ul>
+            </div>
+            <div class='code-examples'>
+                <h4>代码示例:</h4>
+                <div class='code-example'>&lt;img src=&quot;banner.jpg&quot; alt=&quot;[图像描述]&quot;&gt;</div>
+                <div class='code-example-description'>信息性图像示例</div>
+                <div class='code-example'>&lt;img src=&quot;banner.jpg&quot; alt=&quot;&quot; role=&quot;presentation&quot;&gt;</div>
+                <div class='code-example-description'>装饰性图像示例</div>
+            </div>
+            <div class='wcag-reference'><a href='https://www.w3.org/WAI/WCAG22/Understanding/1-1-1.html' target='_blank'>了解更多关于 WCAG 1.1.1 的信息</a></div>
+        </div>
+        <div class='issue'>
+            <div class='issue-header'>
+                <h3 class='issue-title'>3. 表单控件必须有关联的标签</h3>
+                <span class='issue-badge level-A'>WCAG 1.3.1 (级别 A)</span>
+            </div>
+            <div class='issue-description'>表单控件 (id=&quot;username&quot;) 没有关联的标签</div>
+            <div class='issue-location'>行 0, 列 0, 路径 /[document]/html/body/input</div>
+            <div class='code-block'>&lt;input id=&quot;username&quot; type=&quot;text&quot;/&gt;</div>
+            <div class='fix-suggestions'>
+                <h4>修复建议:</h4>
+                <ul>
+                    <li>添加for属性与控件id匹配的label元素</li>
+                    <li>或将控件放在label元素内</li>
+                </ul>
+            </div>
+            <div class='code-examples'>
+                <h4>代码示例:</h4>
+                <div class='code-example'>&lt;label for=&quot;username&quot;&gt;标签文本&lt;/label&gt;
+&lt;input id=&quot;username&quot; type=&quot;text&quot;/&gt;</div>
+                <div class='code-example-description'>使用for属性关联标签</div>
+                <div class='code-example'>&lt;label&gt;
+  标签文本
+  &lt;input id=&quot;username&quot; type=&quot;text&quot;/&gt;
+&lt;/label&gt;</div>
+                <div class='code-example-description'>将控件放在标签内</div>
+            </div>
+            <div class='wcag-reference'><a href='https://www.w3.org/WAI/WCAG22/Understanding/1-3-1.html' target='_blank'>了解更多关于 WCAG 1.3.1 的信息</a></div>
+        </div>
+        <div class='issue'>
+            <div class='issue-header'>
+                <h3 class='issue-title'>4. 表单控件必须有关联的标签</h3>
+                <span class='issue-badge level-A'>WCAG 1.3.1 (级别 A)</span>
+            </div>
+            <div class='issue-description'>与表单控件关联的标签 (for=&quot;password&quot;) 没有文本内容</div>
+            <div class='issue-location'>行 18, 列 5, 路径 /[document]/html/body/label</div>
+            <div class='code-block'>&lt;label for=&quot;password&quot;&gt;&lt;/label&gt;</div>
+            <div class='fix-suggestions'>
+                <h4>修复建议:</h4>
+                <ul>
+                    <li>为标签添加描述性文本</li>
+                </ul>
+            </div>
+            <div class='code-examples'>
+                <h4>代码示例:</h4>
+                <div class='code-example'>&lt;label for=&quot;password&quot;&gt;描述性标签文本&lt;/label&gt;</div>
+                <div class='code-example-description'>添加描述性标签文本</div>
+            </div>
+            <div class='wcag-reference'><a href='https://www.w3.org/WAI/WCAG22/Understanding/1-3-1.html' target='_blank'>了解更多关于 WCAG 1.3.1 的信息</a></div>
+        </div>
+        <div class='issue'>
+            <div class='issue-header'>
+                <h3 class='issue-title'>5. 表单控件必须有关联的标签</h3>
+                <span class='issue-badge level-A'>WCAG 1.3.1 (级别 A)</span>
+            </div>
+            <div class='issue-description'>表单控件 (id=&quot;email&quot;) 没有关联的标签</div>
+            <div class='issue-location'>行 0, 列 0, 路径 /[document]/html/body/input[5]</div>
+            <div class='code-block'>&lt;input id=&quot;email&quot; name=&quot;email&quot; type=&quot;text&quot;/&gt;</div>
+            <div class='fix-suggestions'>
+                <h4>修复建议:</h4>
+                <ul>
+                    <li>添加for属性与控件id匹配的label元素</li>
+                    <li>或将控件放在label元素内</li>
+                </ul>
+            </div>
+            <div class='code-examples'>
+                <h4>代码示例:</h4>
+                <div class='code-example'>&lt;label for=&quot;email&quot;&gt;标签文本&lt;/label&gt;
+&lt;input id=&quot;email&quot; name=&quot;email&quot; type=&quot;text&quot;/&gt;</div>
+                <div class='code-example-description'>使用for属性关联标签</div>
+                <div class='code-example'>&lt;label&gt;
+  标签文本
+  &lt;input id=&quot;email&quot; name=&quot;email&quot; type=&quot;text&quot;/&gt;
+&lt;/label&gt;</div>
+                <div class='code-example-description'>将控件放在标签内</div>
+            </div>
+            <div class='wcag-reference'><a href='https://www.w3.org/WAI/WCAG22/Understanding/1-3-1.html' target='_blank'>了解更多关于 WCAG 1.3.1 的信息</a></div>
+        </div>
+        <div class='issue'>
+            <div class='issue-header'>
+                <h3 class='issue-title'>6. 表单控件必须有关联的标签</h3>
+                <span class='issue-badge level-A'>WCAG 1.3.1 (级别 A)</span>
+            </div>
+            <div class='issue-description'>表单控件 (id=&quot;phone&quot;) 没有关联的标签</div>
+            <div class='issue-location'>行 0, 列 0, 路径 /[document]/html/body/input[6]</div>
+            <div class='code-block'>&lt;input id=&quot;phone&quot; name=&quot;phone&quot; type=&quot;text&quot;/&gt;</div>
+            <div class='fix-suggestions'>
+                <h4>修复建议:</h4>
+                <ul>
+                    <li>添加for属性与控件id匹配的label元素</li>
+                    <li>或将控件放在label元素内</li>
+                </ul>
+            </div>
+            <div class='code-examples'>
+                <h4>代码示例:</h4>
+                <div class='code-example'>&lt;label for=&quot;phone&quot;&gt;标签文本&lt;/label&gt;
+&lt;input id=&quot;phone&quot; name=&quot;phone&quot; type=&quot;text&quot;/&gt;</div>
+                <div class='code-example-description'>使用for属性关联标签</div>
+                <div class='code-example'>&lt;label&gt;
+  标签文本
+  &lt;input id=&quot;phone&quot; name=&quot;phone&quot; type=&quot;text&quot;/&gt;
+&lt;/label&gt;</div>
+                <div class='code-example-description'>将控件放在标签内</div>
+            </div>
+            <div class='wcag-reference'><a href='https://www.w3.org/WAI/WCAG22/Understanding/1-3-1.html' target='_blank'>了解更多关于 WCAG 1.3.1 的信息</a></div>
+        </div>
+        <div class='issue'>
+            <div class='issue-header'>
+                <h3 class='issue-title'>7. 相关表单控件应使用fieldset分组</h3>
+                <span class='issue-badge level-A'>WCAG 1.3.1 (级别 A)</span>
+            </div>
+            <div class='issue-description'>单选按钮组 (name=&quot;gender&quot;) 没有使用fieldset和legend元素分组</div>
+            <div class='issue-location'>行 0, 列 0, 路径 /[document]/html/body/input[3]</div>
+            <div class='code-block'>&lt;input id=&quot;male&quot; name=&quot;gender&quot; type=&quot;radio&quot;/&gt;</div>
+            <div class='fix-suggestions'>
+                <h4>修复建议:</h4>
+                <ul>
+                    <li>使用fieldset元素包围单选按钮组</li>
+                    <li>添加legend元素描述单选按钮组的用途</li>
+                </ul>
+            </div>
+            <div class='code-examples'>
+                <h4>代码示例:</h4>
+                <div class='code-example'>&lt;fieldset&gt;
+  &lt;legend&gt;gender选项&lt;/legend&gt;
+  &lt;input id=&quot;male&quot; name=&quot;gender&quot; type=&quot;radio&quot;/&gt; &lt;label for=&quot;male&quot;&gt;选项文本&lt;/label&gt;
+  &lt;input id=&quot;female&quot; name=&quot;gender&quot; type=&quot;radio&quot;/&gt; &lt;label for=&quot;female&quot;&gt;选项文本&lt;/label&gt;
+&lt;/fieldset&gt;</div>
+                <div class='code-example-description'>使用fieldset和legend分组单选按钮</div>
+            </div>
+            <div class='wcag-reference'><a href='https://www.w3.org/WAI/WCAG22/Understanding/1-3-1.html' target='_blank'>了解更多关于 WCAG 1.3.1 的信息</a></div>
+        </div>
+        <div class='issue'>
+            <div class='issue-header'>
+                <h3 class='issue-title'>8. 输入字段应使用适当的autocomplete属性</h3>
+                <span class='issue-badge level-AA'>WCAG 1.3.5 (级别 AA)</span>
+            </div>
+            <div class='issue-description'>输入字段可能需要autocomplete=&quot;name&quot;属性</div>
+            <div class='issue-location'>行 0, 列 0, 路径 /[document]/html/body/input</div>
+            <div class='code-block'>&lt;input id=&quot;username&quot; type=&quot;text&quot;/&gt;</div>
+            <div class='fix-suggestions'>
+                <h4>修复建议:</h4>
+                <ul>
+                    <li>添加autocomplete=&quot;name&quot;属性</li>
+                </ul>
+            </div>
+            <div class='code-examples'>
+                <h4>代码示例:</h4>
+                <div class='code-example'>&lt;input type=&quot;text&quot; id=&quot;username&quot; autocomplete=&quot;name&quot;&gt;</div>
+                <div class='code-example-description'>添加autocomplete=&quot;name&quot;属性</div>
+            </div>
+            <div class='wcag-reference'><a href='https://www.w3.org/WAI/WCAG22/Understanding/1-3-5.html' target='_blank'>了解更多关于 WCAG 1.3.5 的信息</a></div>
+        </div>
+        <div class='issue'>
+            <div class='issue-header'>
+                <h3 class='issue-title'>9. 输入字段应使用适当的autocomplete属性</h3>
+                <span class='issue-badge level-AA'>WCAG 1.3.5 (级别 AA)</span>
+            </div>
+            <div class='issue-description'>输入字段可能需要autocomplete=&quot;password&quot;属性</div>
+            <div class='issue-location'>行 0, 列 0, 路径 /[document]/html/body/input[2]</div>
+            <div class='code-block'>&lt;input id=&quot;password&quot; type=&quot;password&quot;/&gt;</div>
+            <div class='fix-suggestions'>
+                <h4>修复建议:</h4>
+                <ul>
+                    <li>添加autocomplete=&quot;password&quot;属性</li>
+                </ul>
+            </div>
+            <div class='code-examples'>
+                <h4>代码示例:</h4>
+                <div class='code-example'>&lt;input type=&quot;password&quot; id=&quot;password&quot; autocomplete=&quot;password&quot;&gt;</div>
+                <div class='code-example-description'>添加autocomplete=&quot;password&quot;属性</div>
+            </div>
+            <div class='wcag-reference'><a href='https://www.w3.org/WAI/WCAG22/Understanding/1-3-5.html' target='_blank'>了解更多关于 WCAG 1.3.5 的信息</a></div>
+        </div>
+        <div class='issue'>
+            <div class='issue-header'>
+                <h3 class='issue-title'>10. 输入字段应使用适当的autocomplete属性</h3>
+                <span class='issue-badge level-AA'>WCAG 1.3.5 (级别 AA)</span>
+            </div>
+            <div class='issue-description'>输入字段可能需要autocomplete=&quot;email&quot;属性</div>
+            <div class='issue-location'>行 0, 列 0, 路径 /[document]/html/body/input[5]</div>
+            <div class='code-block'>&lt;input id=&quot;email&quot; name=&quot;email&quot; type=&quot;text&quot;/&gt;</div>
+            <div class='fix-suggestions'>
+                <h4>修复建议:</h4>
+                <ul>
+                    <li>添加autocomplete=&quot;email&quot;属性</li>
+                </ul>
+            </div>
+            <div class='code-examples'>
+                <h4>代码示例:</h4>
+                <div class='code-example'>&lt;input type=&quot;text&quot; name=&quot;email&quot; id=&quot;email&quot; autocomplete=&quot;email&quot;&gt;</div>
+                <div class='code-example-description'>添加autocomplete=&quot;email&quot;属性</div>
+            </div>
+            <div class='wcag-reference'><a href='https://www.w3.org/WAI/WCAG22/Understanding/1-3-5.html' target='_blank'>了解更多关于 WCAG 1.3.5 的信息</a></div>
+        </div>
+        <div class='issue'>
+            <div class='issue-header'>
+                <h3 class='issue-title'>11. 输入字段应使用适当的autocomplete属性</h3>
+                <span class='issue-badge level-AA'>WCAG 1.3.5 (级别 AA)</span>
+            </div>
+            <div class='issue-description'>输入字段可能需要autocomplete=&quot;tel&quot;属性</div>
+            <div class='issue-location'>行 0, 列 0, 路径 /[document]/html/body/input[6]</div>
+            <div class='code-block'>&lt;input id=&quot;phone&quot; name=&quot;phone&quot; type=&quot;text&quot;/&gt;</div>
+            <div class='fix-suggestions'>
+                <h4>修复建议:</h4>
+                <ul>
+                    <li>添加autocomplete=&quot;tel&quot;属性</li>
+                </ul>
+            </div>
+            <div class='code-examples'>
+                <h4>代码示例:</h4>
+                <div class='code-example'>&lt;input type=&quot;text&quot; name=&quot;phone&quot; id=&quot;phone&quot; autocomplete=&quot;tel&quot;&gt;</div>
+                <div class='code-example-description'>添加autocomplete=&quot;tel&quot;属性</div>
+            </div>
+            <div class='wcag-reference'><a href='https://www.w3.org/WAI/WCAG22/Understanding/1-3-5.html' target='_blank'>了解更多关于 WCAG 1.3.5 的信息</a></div>
+        </div>
+        <div class='issue'>
+            <div class='issue-header'>
+                <h3 class='issue-title'>12. 标题层次结构必须正确</h3>
+                <span class='issue-badge level-A'>WCAG 1.3.1 (级别 A)</span>
+            </div>
+            <div class='issue-description'>标题层次结构不正确：从h1跳到h3</div>
+            <div class='issue-location'>行 29, 列 5, 路径 /[document]/html/body/h3</div>
+            <div class='code-block'>&lt;h3&gt;子标题&lt;/h3&gt;</div>
+            <div class='fix-suggestions'>
+                <h4>修复建议:</h4>
+                <ul>
+                    <li>添加h2作为中间层次</li>
+                    <li>或将当前h3改为h2</li>
+                </ul>
+            </div>
+            <div class='code-examples'>
+                <h4>代码示例:</h4>
+                <div class='code-example'>&lt;h2&gt;中间层次标题&lt;/h2&gt;
+&lt;h3&gt;子标题&lt;/h3&gt;</div>
+                <div class='code-example-description'>添加中间层次标题</div>
+                <div class='code-example'>&lt;h2&gt;子标题&lt;/h2&gt;</div>
+                <div class='code-example-description'>将h3改为h2</div>
+            </div>
+            <div class='wcag-reference'><a href='https://www.w3.org/WAI/WCAG22/Understanding/1-3-1.html' target='_blank'>了解更多关于 WCAG 1.3.1 的信息</a></div>
+        </div>
+        <div class='issue'>
+            <div class='issue-header'>
+                <h3 class='issue-title'>13. 页面必须指定语言</h3>
+                <span class='issue-badge level-A'>WCAG 3.1.1 (级别 A)</span>
+            </div>
+            <div class='issue-description'>页面没有通过html元素的lang属性指定默认语言</div>
+            <div class='issue-location'>行 0, 列 0, 路径 /[document]/html</div>
+            <div class='code-block'>&lt;html&gt;
+&lt;head&gt;
+&lt;title&gt;WCAG测试页面&lt;/title&gt;
+&lt;meta charset=&quot;utf-8&quot;/&gt;
+&lt;/head&gt;
+&lt;body&gt;
+&lt;!-- 图像无alt属性 --&gt;
+&lt;img ...</div>
+            <div class='fix-suggestions'>
+                <h4>修复建议:</h4>
+                <ul>
+                    <li>为html元素添加lang属性，指定页面的默认语言</li>
+                </ul>
+            </div>
+            <div class='code-examples'>
+                <h4>代码示例:</h4>
+                <div class='code-example'>&lt;html lang=&quot;zh-CN&quot;&gt;</div>
+                <div class='code-example-description'>指定简体中文</div>
+                <div class='code-example'>&lt;html lang=&quot;en&quot;&gt;</div>
+                <div class='code-example-description'>指定英文</div>
+            </div>
+            <div class='wcag-reference'><a href='https://www.w3.org/WAI/WCAG22/Understanding/3-1-1.html' target='_blank'>了解更多关于 WCAG 3.1.1 的信息</a></div>
+        </div>
+        <div class='issue'>
+            <div class='issue-header'>
+                <h3 class='issue-title'>14. HTML必须可以正确解析</h3>
+                <span class='issue-badge level-A'>WCAG 4.1.1 (级别 A)</span>
+            </div>
+            <div class='issue-description'>重复的id属性: &#x27;content&#x27;已在其他元素中使用</div>
+            <div class='issue-location'>行 37, 列 5, 路径 /[document]/html/body/div[2]</div>
+            <div class='code-block'>&lt;div id=&quot;content&quot;&gt;第二个内容&lt;/div&gt;</div>
+            <div class='fix-suggestions'>
+                <h4>修复建议:</h4>
+                <ul>
+                    <li>修改id属性为唯一值</li>
+                </ul>
+            </div>
+            <div class='code-examples'>
+                <h4>代码示例:</h4>
+                <div class='code-example'>&lt;div id=&quot;unique-content&quot; &gt;&lt;/div&gt;</div>
+            </div>
+            <div class='wcag-reference'><a href='https://www.w3.org/WAI/WCAG22/Understanding/4-1-1.html' target='_blank'>了解更多关于 WCAG 4.1.1 的信息</a></div>
+        </div>
+        <div class='issue'>
+            <div class='issue-header'>
+                <h3 class='issue-title'>15. ARIA属性必须正确使用</h3>
+                <span class='issue-badge level-A'>WCAG 4.1.2 (级别 A)</span>
+            </div>
+            <div class='issue-description'>元素的aria-label属性为空</div>
+            <div class='issue-location'>行 40, 列 5, 路径 /[document]/html/body/button</div>
+            <div class='code-block'>&lt;button aria-label=&quot;&quot;&gt;提交&lt;/button&gt;</div>
+            <div class='fix-suggestions'>
+                <h4>修复建议:</h4>
+                <ul>
+                    <li>为aria-label添加描述性文本</li>
+                    <li>或移除空的aria-label属性</li>
+                </ul>
+            </div>
+            <div class='code-examples'>
+                <h4>代码示例:</h4>
+                <div class='code-example'>&lt;button  aria-label=&quot;描述性文本&quot;&gt;&lt;/button&gt;</div>
+            </div>
+            <div class='wcag-reference'><a href='https://www.w3.org/WAI/WCAG22/Understanding/4-1-2.html' target='_blank'>了解更多关于 WCAG 4.1.2 的信息</a></div>
+        </div>
+        <div class='issue'>
+            <div class='issue-header'>
+                <h3 class='issue-title'>16. 链接文本必须描述其目的</h3>
+                <span class='issue-badge level-A'>WCAG 2.4.4 (级别 A)</span>
+            </div>
+            <div class='issue-description'>链接文本 &#x27;点击这里&#x27; 不足以描述链接目的</div>
+            <div class='issue-location'>行 32, 列 5, 路径 /[document]/html/body/a</div>
+            <div class='code-block'>&lt;a href=&quot;page.html&quot;&gt;点击这里&lt;/a&gt;</div>
+            <div class='fix-suggestions'>
+                <h4>修复建议:</h4>
+                <ul>
+                    <li>使用描述链接目的的文本替换通用文本</li>
+                </ul>
+            </div>
+            <div class='code-examples'>
+                <h4>代码示例:</h4>
+                <div class='code-example'>&lt;a href=&quot;page.html&quot;&gt;描述性链接文本&lt;/a&gt;</div>
+                <div class='code-example-description'>使用描述性链接文本</div>
+            </div>
+            <div class='wcag-reference'><a href='https://www.w3.org/WAI/WCAG22/Understanding/2-4-4.html' target='_blank'>了解更多关于 WCAG 2.4.4 的信息</a></div>
+        </div>
+        <div class='issue'>
+            <div class='issue-header'>
+                <h3 class='issue-title'>17. 链接文本必须描述其目的</h3>
+                <span class='issue-badge level-A'>WCAG 2.4.4 (级别 A)</span>
+            </div>
+            <div class='issue-description'>链接没有描述性文本</div>
+            <div class='issue-location'>行 33, 列 5, 路径 /[document]/html/body/a[2]</div>
+            <div class='code-block'>&lt;a href=&quot;contact.html&quot;&gt;&lt;/a&gt;</div>
+            <div class='fix-suggestions'>
+                <h4>修复建议:</h4>
+                <ul>
+                    <li>添加描述链接目的的文本</li>
+                    <li>或为链接添加aria-label属性</li>
+                </ul>
+            </div>
+            <div class='code-examples'>
+                <h4>代码示例:</h4>
+                <div class='code-example'>&lt;a href=&quot;contact.html&quot;&gt;描述性链接文本&lt;/a&gt;</div>
+                <div class='code-example-description'>添加描述性链接文本</div>
+                <div class='code-example'>&lt;a href=&quot;contact.html&quot; aria-label=&quot;描述性链接文本&quot;&gt;&lt;/a&gt;</div>
+                <div class='code-example-description'>添加aria-label属性</div>
+            </div>
+            <div class='wcag-reference'><a href='https://www.w3.org/WAI/WCAG22/Understanding/2-4-4.html' target='_blank'>了解更多关于 WCAG 2.4.4 的信息</a></div>
+        </div>
+        <footer>
+            <p>由 WCAG 2.2 验证器生成</p>
+        </footer>
+    </div>
+</body>
+</html>

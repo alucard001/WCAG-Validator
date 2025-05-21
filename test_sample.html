@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>WCAG测试页面</title>
+    <meta charset="utf-8">
+</head>
+<body>
+    <!-- 图像无alt属性 -->
+    <img src="logo.png">
+    
+    <!-- 空alt属性但非装饰性 -->
+    <img src="banner.jpg" alt="">
+    
+    <!-- 表单控件无标签 -->
+    <input type="text" id="username">
+    
+    <!-- 标签无文本 -->
+    <label for="password"></label>
+    <input type="password" id="password">
+    
+    <!-- 单选按钮组无fieldset -->
+    <input type="radio" name="gender" id="male">
+    <label for="male">男</label>
+    <input type="radio" name="gender" id="female">
+    <label for="female">女</label>
+    
+    <!-- 标题层次不正确 -->
+    <h1>主标题</h1>
+    <h3>子标题</h3>
+    
+    <!-- 链接无描述性文本 -->
+    <a href="page.html">点击这里</a>
+    <a href="contact.html"></a>
+    
+    <!-- 重复的ID -->
+    <div id="content">第一个内容</div>
+    <div id="content">第二个内容</div>
+    
+    <!-- 空的aria-label -->
+    <button aria-label="">提交</button>
+    
+    <!-- 可能需要autocomplete的字段 -->
+    <input type="text" name="email" id="email">
+    <input type="text" name="phone" id="phone">
+</body>
+</html>
