@@ -89,6 +89,19 @@ print(console_report)
 python -m wcag_validator.cli path/to/file.html --level AA --format html --output report.html
 ```
 
+```bash
+# Using Docker with Python 3.11
+docker run --rm -v ${pwd}:/app -w /app python:3.11 /bin/bash
+# Install requirements
+pip install .
+# In another terminal, commit docker image change, and you can exit the docker container
+docker commit $(docker ps -lq) accessibility:latest
+
+# Run below command to use wcag_validator as docker container
+# docker run --rm -v ${pwd}:/app -w /app accessibility:latest python3 -m wcag_validator.cli path/to/file.html --level AA --format html --output report.html
+docker run --rm -v ${pwd}:/app -w /app accessibility:latest python3 -m wcag_validator.cli https://www.google.com
+```
+
 ## 支持的WCAG 2.2标准
 
 该库支持检测以下WCAG 2.2标准：
